@@ -1,0 +1,39 @@
+<html>
+  <head>
+    <link rel = "stylesheet" type = "text/css" href = "style.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <meta charset="UTF-8">
+  </head>
+    <body onload="setPreviousGame();">
+      <div class="jumbotron text-center">
+        <h1>Tic-Tac-Toe<h1>
+        <h2><a href="javascript:startGame();">Start a new game</a></h2>
+        <h2 id="message"></h2>
+      </div>
+      <div class="container">
+        <div class="row vertical-center-row">
+            <div class="text-center col-md-12 col-md-offset-4">
+              <table border="1">
+                <tr>
+                  <td id="s1" class="square" onclick="nextMove(1);"></td>
+                  <td id="s2" class="square" onclick="nextMove(2);"></td>
+                  <td id="s3" class="square" onclick="nextMove(3);"></td>
+                </tr>
+                <tr>
+                  <td id="s4" class="square" onclick="nextMove(4);"></td>
+                  <td id="s5" class="square" onclick="nextMove(5);"></td>
+                  <td id="s6" class="square" onclick="nextMove(6);"></td>
+                </tr>
+                <tr>
+                  <td id="s7" class="square" onclick="nextMove(7);"></td>
+                  <td id="s8" class="square" onclick="nextMove(8);"></td>
+                  <td id="s9" class="square" onclick="nextMove(9);"></td>
+                </tr>
+              </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      <script src="main.js"></script>
+    </body>
+<html>
