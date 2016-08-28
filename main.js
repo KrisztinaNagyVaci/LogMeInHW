@@ -1,6 +1,6 @@
 function startGame() {
   localStorage.clear();
-  for (var i = 1; i <= 9; i = i + 1) {
+  for (var i = 1; i <= 9; i++) {
     clearBox(i);
   };
   document.turn = "X";
@@ -10,7 +10,7 @@ function startGame() {
 
 function setPreviousGame() {
   document.turn = " ";
-  for (var i = 1; i<=9; i++) {
+  for (var i = 1; i <= 9; i++) {
     var square = localStorage.getItem(i);
     if (square != null) {
       var x = document.getElementById("s" + i);
