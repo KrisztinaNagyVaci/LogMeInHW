@@ -1,43 +1,175 @@
-function startGame() {
-  localStorage.clear();
+// **************view*****************************
+
+var view = (function(){
+
+var messages = {
+  start : " gets to start.",
+  wonAlready : " already won the game.",
+  squareTaken : "That square is already taken.",
+  congrats : "Congratulations, ",
+  win : "! You win!"
+};
+
+function drawOneSquare(place) {
+  place.innerText = document.turn;
+};
+
+function drawAllSquares() {
+  var list = model.getItemsfromLocalstorage()
+  for (var i = 0; i <= 9; i++) {
+    if (isSquareNull(list[i])) {
+      var x = document.getElementById("s" + i);
+      x.innerText = list[i];
+    }
+  };
+};
+
+function getBox(number) {
+  return document.getElementById("s" + number).innerText;
+};
+
+function getSquareNumber(square) {
+  return document.getElementById("s" + square);
+};
+
+function clearBox(number) {
+  document.getElementById("s" + number).innerText = "";
+};
+
+function clearBoxes() {
   for (var i = 1; i <= 9; i++) {
     clearBox(i);
   };
-  document.turn = "X";
-  document.winner = null;
-  setMessage(document.turn + " gets to start.");
 };
 
-function setPreviousGame() {
-  document.turn = " ";
-  for (var i = 1; i <= 9; i++) {
-    var square = localStorage.getItem(i);
-    if (square != null) {
-      var x = document.getElementById("s" + i);
-      x.innerText = square;
-    };
+function isSquareNull(square) {
+  if (square != null) {
+    return true;
   };
-  document.turn = "X";
-  setMessage(document.turn + " gets to start.");
+};
+
+function isEmpty(number) {
+  var result = false;
+  var place = document.getElementById("s" + number);
+  if (place.innerText === "") {
+    result = true;
+  };
+  return result;
+};
+
+function setTurntoX() {
+  return document.turn = "X";
+};
+
+function setTurntoO() {
+  return document.turn = "O";
+};
+
+function setTurntoEmpty() {
+  return document.turn = " ";
+};
+
+function setWinner() {
+  document.winner = document.turn;
+};
+
+function setWinnertoNull() {
+  return document.winner = null;
+};
+
+function isWinner() {
+  if (document.winner != null) {
+    return true;
+  };
 };
 
 function setMessage(msg) {
   document.getElementById("message").innerText = msg;
 };
 
+return {
+    messages: messages,
+    drawOneSquare: drawOneSquare,
+    drawAllSquares: drawAllSquares,
+    getBox: getBox,
+    getSquareNumber: getSquareNumber,
+    clearBox: clearBox,
+    clearBoxes: clearBoxes,
+    isSquareNull: isSquareNull,
+    isEmpty: isEmpty,
+    setTurntoX: setTurntoX,
+    setTurntoO: setTurntoO,
+    setTurntoEmpty: setTurntoEmpty,
+    setWinner: setWinner,
+    setWinnertoNull: setWinnertoNull,
+    isWinner: isWinner,
+    setMessage: setMessage
+  }
+
+})();
+
+
+// **************controller****************************
+
+function startGame() {
+  model.clearLocalstorage();
+  view.clearBoxes();
+  view.setTurntoX();
+  view.setWinnertoNull();
+  view.setMessage(document.turn + view.messages.start);
+};
+
+function setPreviousGame() {
+  view.setTurntoEmpty();
+  view.drawAllSquares();
+  view.setTurntoX();
+  view.setMessage(document.turn + view.messages.start);
+};
+
 function nextMove(square) {
-  var place = document.getElementById("s" + square);
   this.square = square;
-  if (document.winner != null) {
-    setMessage(document.winner + " already won the game.")
-  } else if (place.innerText === "") {
-    place.innerText = document.turn;
-    var id = this.square;
-    localStorage.setItem(id, document.turn);
+  var place = view.getSquareNumber(square);
+  if (view.isWinner()) {
+    view.setMessage(document.winner + view.messages.wonAlready);
+  } else if (view.isEmpty(square)) {
+    view.drawOneSquare(place);
+    model.setItemInLocalstorage(this.square, document.turn);
     computersTurn();
   } else {
-    setMessage("That square is already taken.");
+    view.setMessage(view.messages.squareTaken);
   };
+};
+
+function computersTurn() {
+  if (model.checkForWinner(document.turn)) {
+    view.setMessage(view.messages.congrats + document.turn + view.messages.win);
+    view.setWinner();
+  } else if (document.turn === "X") {
+    view.setTurntoO();
+    model.checkForDoubles();
+  };
+};
+
+// **********************model*********************************
+
+var model = (function(){
+
+var listOfLocalstorageItems = [];
+
+function clearLocalstorage() {
+  localStorage.clear();
+};
+
+function getItemsfromLocalstorage() {
+  for (var i = 0; i <= 9; i++) {
+    var square = localStorage.getItem(i);
+    listOfLocalstorageItems.push(square);
+  };
+  return listOfLocalstorageItems;
+};
+
+function setItemInLocalstorage(square, turn) {
+  localStorage.setItem(square, turn);
 };
 
 function randomCalc() {
@@ -50,24 +182,14 @@ function randomCalc() {
   };
 };
 
-function computersTurn() {
-  if (checkForWinner(document.turn)) {
-    setMessage("Congratulations, " + document.turn + "! You win!");
-    document.winner = document.turn;
-  } else if (document.turn === "X") {
-    document.turn = "O";
-    checkForDoubles();
-  };
-};
-
 function moveOrRandom (number) {
-  if (isEmpty(number)) {
+  if (view.isEmpty(number)) {
     nextMove(number);
-    document.turn = "X";
+    view.setTurntoX()
   } else {
     randomCalc();
   };
-}
+};
 
 function checkForDoubles() {
   if (checkDouble(1, 2)) {
@@ -124,7 +246,7 @@ function checkForWinner(move) {
 
 function checkRow(a, b, c, move) {
   var result = false;
-  if (getBox(a) === move && getBox(b) === move && getBox(c) === move) {
+  if (view.getBox(a) === move && view.getBox(b) === move && view.getBox(c) === move) {
     result = true;
   };
   return result;
@@ -132,25 +254,23 @@ function checkRow(a, b, c, move) {
 
 function checkDouble(a, b) {
   var result = false;
-  if (getBox(a) === "X" && getBox(b) === "X") {
+  if (view.getBox(a) === "X" && view.getBox(b) === "X") {
     result = true;
   };
   return result;
 };
 
-function isEmpty(number) {
-  var result = false;
-  var place = document.getElementById("s" + number);
-  if (place.innerText === "") {
-    result = true;
-  };
-  return result;
-};
+return {
+    listOfLocalstorageItems: listOfLocalstorageItems,
+    clearLocalstorage: clearLocalstorage,
+    getItemsfromLocalstorage: getItemsfromLocalstorage,
+    setItemInLocalstorage: setItemInLocalstorage,
+    randomCalc: randomCalc,
+    moveOrRandom: moveOrRandom,
+    checkForDoubles: checkForDoubles,
+    checkForWinner: checkForWinner,
+    checkRow: checkRow,
+    checkDouble: checkDouble
+  }
 
-function getBox(number) {
-  return document.getElementById("s" + number).innerText;
-};
-
-function clearBox(number) {
-  document.getElementById("s" + number).innerText = "";
-};
+})();
